@@ -3,8 +3,10 @@ ui <- dashboardPage(
   dashboardHeader(title = "Indel Signature Browser"),
   dashboardSidebar(
     sidebarMenu(id = "tabs",
+                menuItem("Home page", tabName = "home", icon = icon("house")),
                 menuItem("Koh ID89 Browser", tabName = "browser", icon = icon("dna")),
-                menuItem("COSMIC ID83 Browser", tabName = "id83_browser", icon = icon("layer-group"))
+                menuItem("COSMIC ID83 Browser", tabName = "id83_browser", icon = icon("layer-group")),
+                menuItem("About", tabName = "about", icon = icon("info-circle"))
     ),
     conditionalPanel(
       condition = "input.tabs == 'browser'",
@@ -15,7 +17,7 @@ ui <- dashboardPage(
         selected = c("ID89", "ID83", "ID476")
       )
     )
-  ),
+  ),  # ← dashboardSidebar 结束
   dashboardBody(
     useShinyjs(),
     tags$style(HTML("
@@ -165,9 +167,94 @@ ui <- dashboardPage(
         border-radius: 12px 12px 0 0;
       }
     ")),
+    
     tabItems(
-      tabItem(tabName = "browser", uiOutput("signature_display")),
-      tabItem(tabName = "id83_browser", uiOutput("id83_display"))
-    )
+      
+      # Home page
+      tabItem(
+        tabName = "home",
+        h1(
+          "Small Insertions and Deletions (ID) Signatures",
+          style = "color:#2c3e50; font-weight:700; margin-bottom:25px;"
+        ),
+        h3(
+          "Small insertions and deletions (ID), also known as indels, are defined as the incorporation or loss of small fragments of DNA (usually between 1 and 50 base pairs) in a specific genomic location.Although there is no single intuitive and naturally constrained set of ID mutation types (as there arguably are for single base substitutions and doublet base substitutions), a compilation of 83 different types considering size, nucleotides affected and presence on repetitive and/or microhomology regions was used to extract mutational signatures. It can be found here.Click on any signature below to learn more about its details..",
+          style = "color:#34495e; font-size:20px; line-height:1.5; margin-bottom:18px;"
+        ),
+        h3(
+          "Signature extraction methodsWith a few exceptions, the current set of reference signatures were extracted using SigProfiler (as described in Alexandrov, L.B. et al., 2020) from the 2,780 whole-genome variant calls produced by the ICGC/TCGA Pan Cancer Analysis of Whole Genomes (PCAWG) Network. The stability and reproducibility of the signatures were assessed on somatic mutations from an additional 1,865 whole genomes and 19,184 exomes. All input data and references for original sources are available from synapse.org ID syn11801889.",
+          style = "color:#34495e; font-size:20px; line-height:1.5; margin-bottom:18px;"
+        ),
+        h3(
+          "Please select a group from the sidebar.",
+          style = "color:#2c3e50; font-size:20px; margin-top:25px;"
+        )
+      ),
+      
+      # Signature browser page
+      tabItem(
+        tabName = "browser",
+        uiOutput("signature_display")
+      ),
+      
+      # ID83 browser page
+      tabItem(
+        tabName = "id83_browser",
+        uiOutput("id83_display")
+      ),
+      
+      # About page（新增）
+      tabItem(
+        tabName = "about",
+        fluidRow(
+          column(10, offset = 1,
+                 div(class = "img-container",
+                     h2("About", 
+                        style = "color:#2c3e50; font-weight:600; margin-bottom:30px; text-align:center;"),
+                     
+                     # Contact Us
+                     h3("Contact Us", 
+                        style = "color:#3498db; font-weight:600; margin-top:25px; margin-bottom:15px;"),
+                     tags$p(style = "font-size:16px; line-height:1.8; color:#555;",
+                            "If you experience any issues or have suggestions while visiting this website, don't hesitate to reach out to us."
+                     ),
+                     
+                     hr(style = "margin: 30px 0; border-top: 1px solid #e0e0e0;"),
+                     
+                     # Main Contributors
+                     h3("Main Contributors", 
+                        style = "color:#3498db; font-weight:600; margin-top:25px; margin-bottom:15px;"),
+                     tags$p(style = "font-size:16px; line-height:2; color:#555;",
+                            "• Xueming Wu",
+                            tags$br(),
+                            "• Mo Liu",
+                            tags$br(),
+                            "• Steverozen"
+                     ),
+                     
+                     hr(style = "margin: 30px 0; border-top: 1px solid #e0e0e0;"),
+                     
+                     # Email
+                     h3("Email", 
+                        style = "color:#3498db; font-weight:600; margin-top:25px; margin-bottom:15px;"),
+                     tags$p(style = "font-size:16px; line-height:1.8; color:#555;",
+                            icon("envelope", style = "color:#3498db; margin-right:8px;"),
+                            tags$a(href = "mailto:wuxm8523@gmail.com", 
+                                   "wuxm8523@gmail.com",
+                                   style = "color:#3498db; text-decoration:none;")
+                     ),
+                     
+                     hr(style = "margin: 40px 0; border-top: 1px solid #e0e0e0;"),
+                     
+                     # Footer
+                     tags$p(style = "text-align:center; color:#999; margin-top:40px; font-size:14px;",
+                            "© 2025 Indel Signature Browser. All rights reserved."
+                     )
+                 )
+          )
+        )
+      )
+      
+    )  # ← tabItems 结束
   )
 )

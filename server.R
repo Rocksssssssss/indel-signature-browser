@@ -40,16 +40,32 @@ for (group_name in names(signature_groups)) {
   if (!is.null(sig$id83_name) && !is.na(sig$id83_name)) {
     id83_key <- sig$id83_name
     if (is.null(id83_groups[[id83_key]])) {
-      id83_groups[[id83_key]] <- list(members = character(), id83_all = character())
+      id83_groups[[id83_key]] <- list(
+        members = character(), 
+        id83_all = character(),
+        thumbnail = character()
+      )
     }
     id83_groups[[id83_key]]$members <- c(id83_groups[[id83_key]]$members, group_name)
+    
     if (length(id83_groups[[id83_key]]$id83_all) == 0 && length(sig$id83) > 0) {
       id83_groups[[id83_key]]$id83_all <- sig$id83[1]
     }
+    
+    # 保存第一个成员的缩略图
+    if (length(id83_groups[[id83_key]]$thumbnail) == 0) {
+      thumbnail_name <- paste0(group_name, "_", id83_key, "_83allthumbnail.png")
+      if (file.exists(file.path("www/id83thumbnail", thumbnail_name))) {
+        id83_groups[[id83_key]]$thumbnail <- file.path("id83thumbnail", thumbnail_name)
+      }
+    }
   }
-}
+} 
 
 server <- function(input, output, session){
+  observe({
+    runjs("$('.sidebar-menu li').removeClass('active');")
+  })
   current_group <- reactiveVal(NULL)
   current_id83 <- reactiveVal(NULL)
   
@@ -179,14 +195,36 @@ server <- function(input, output, session){
   # ---------------- ID83 Browser 页面 ----------------
   output$id83_display <- renderUI({
     if (is.null(current_id83())) {
+      
+      
       fluidRow(
         lapply(names(id83_groups), function(id83_name){
           id83_info <- id83_groups[[id83_name]]
           members_text <- paste(id83_info$members, collapse = ", ")
+          thumbnail_path <- id83_info$thumbnail 
           
+
           column(3,
                  div(class = "thumbnail-card",
                      h4(id83_name, style = "color:#27ae60;"),
+                    
+                     
+                     # 添加缩略图显示
+                     if(!is.null(thumbnail_path)&&length(thumbnail_path)> 0 &&
+                        file.exists(file.path("www",thumbnail_path))){
+                       tags$img(src = thumbnail_path,
+                                style = "width:100%; max-width:200px; height:auto; 
+                              margin-bottom:15px; border-radius:8px; 
+                              border:2px solid #e8eaed;")
+                     } else {
+                       div(style = "height:120px; line-height:120px; color:#95a5a6; 
+                          margin-bottom:15px;", 
+                          icon("image", style = "font-size:48px;"),
+                          br(),
+                          tags$small("缩略图未找到")
+                          )
+                     },
+        
                      div(style = "background:#ecf0f1; padding:15px; border-radius:8px; margin-bottom:15px;",
                          div(style = "font-size:11px; color:#7f8c8d; margin-bottom:5px;", "MEMBERS"),
                          div(style = "font-size:12px; color:#34495e; font-weight:500;", members_text)
@@ -337,4 +375,5 @@ server <- function(input, output, session){
       })
     })
   })
+
 }

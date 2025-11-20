@@ -241,9 +241,9 @@ ui <- navbarPage(
     div(class = "img-container",
         h1("Small Insertions and Deletions (ID) Signatures",
            style = "color:#2c3e50; font-weight:700; margin-bottom:25px;"),
-        h3("Small insertions and deletions (ID), also known as indels, are defined as the incorporation or loss of small fragments of DNA (usually between 1 and 50 base pairs) in a specific genomic location.Although there is no single intuitive and naturally constrained set of ID mutation types (as there arguably are for single base substitutions and doublet base substitutions), a compilation of 83 different types considering size, nucleotides affected and presence on repetitive and/or microhomology regions was used to extract mutational signatures. It can be found here.Click on any signature below to learn more about its details..",
+        h3("Small insertions and deletions (ID), also known as indels, are defined as the incorporation or loss of small fragments of DNA (usually between 1 and 50 base pairs) in a specific genomic location.Although there is no single intuitive and naturally constrained set of ID mutation types (as there arguably are for single base substitutions and doublet base substitutions). The Indel Signature Browser incorporates three types of ID taxonomy, COSMIC83 (the most conventional classification as described in Alexandrov et al., 2020), Koh89 and Koh476 (new ID taxonomy described in Koh et al., 2025)",
            style = "color:#34495e; font-size:18px; line-height:1.8; margin-bottom:20px;"),
-        h3("Signature extraction methodsWith a few exceptions, the current set of reference signatures were extracted using SigProfiler (as described in Alexandrov, L.B. et al., 2020) from the 2,780 whole-genome variant calls produced by the ICGC/TCGA Pan Cancer Analysis of Whole Genomes (PCAWG) Network. The stability and reproducibility of the signatures were assessed on somatic mutations from an additional 1,865 whole genomes and 19,184 exomes. All input data and references for original sources are available from synapse.org ID syn11801889.",
+        h3("With a few exceptions, the current set of reference signatures were extracted using both SigProfiler (as described in Alexandrov et al., 2020) and mSigHdp (Liu et al., 2023) from the 2,780 whole-genome from ICGC/TCGA Pan Cancer Analysis of Whole Genomes (PCAWG) Network and >4,000 whole-genome from Hartwig Medical Foundation. ",
            style = "color:#34495e; font-size:18px; line-height:1.8; margin-bottom:20px;"),
         h3("Please select a group from the navigation bar above.",
            style = "color:#3498db; font-size:20px; margin-top:25px; font-weight:600;")
@@ -298,7 +298,7 @@ ui <- navbarPage(
                  tags$p(style = "font-size:17px; line-height:2.2; color:#555;",
                         "• Xueming Wu", tags$br(),
                         "• Mo Liu", tags$br(),
-                        "• Steverozen"
+                        "• Steve G. Rozen"
                  ),
                  
                  hr(style = "margin: 35px 0; border-top: 2px solid #2ecc71; opacity: 0.3;"),
@@ -309,6 +309,8 @@ ui <- navbarPage(
                         icon("envelope", style = "color:#e74c3c; margin-right:10px; font-size:20px;"),
                         tags$a(href = "mailto:wuxm8523@gmail.com", 
                                "wuxm8523@gmail.com",
+                               href = "mailto:mo.liu@gzhmu.edu.cn", 
+                                "mo.liu@gzhmu.edu.cn",
                                style = "color:#3498db; text-decoration:none; font-weight:600;")
                  ),
                  

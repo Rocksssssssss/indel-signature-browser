@@ -1,17 +1,22 @@
-df <- read.delim("./ID89_ID83_connection_example.txt",
-                 header = TRUE, stringsAsFactors = FALSE)
+id89_df  <- read.delim("./ID89_ID83_connection_example.txt",
+                 header = TRUE,
+                 stringsAsFactors = FALSE)
 
-df1 <- read.csv("./mSigHdp.indel476.final.signatures.csv",
+id476_df <- read.csv("./mSigHdp.indel476.final.signatures.csv",
                 header = TRUE, check.names = FALSE, stringsAsFactors = FALSE, row.names = NULL)
 
-ID476_list <- colnames(df1)
+ID476_list <- colnames(id476_df)
 all_pngs <- list.files("./www", pattern = "\\.png$", full.names = FALSE)
 signature_groups <- list()
 
-for (i in seq_len(nrow(df))) {
-  ID89 <- df$InDel89[i]
-  ID83 <- df$InDel83[i]
+for (i in seq_len(nrow(id89_df ))) {
+  ID89 <- id89_df $InDel89[i]
+  ID83 <- id89_df $InDel83[i]
   ID476 <- if (i <= length(ID476_list)) ID476_list[i] else NA_character_
+  
+  # 读取 Proposed aetiology（假设在第4列）
+  # 根据你的实际列名调整，可能是 id89_df $Aetiology 或 id89_df [,4]
+  aetiology <- if (ncol(id89_df ) >= 4) id89_df [i, 4] else"Unknown"
   
   imgs <- paste0(ID89, c("_signature.89spectrum.png","_89spectrumA.png","_89spectrumB.png","_89spectrumC.png"))
   id83_imgs <- paste0(ID89, "_", ID83, c("_83all.png", "_83filtered.png"))
@@ -22,13 +27,15 @@ for (i in seq_len(nrow(df))) {
       imgs = imgs, id83 = character(0), id83_name = NA_character_,
       id476 = if (length(id476_imgs) > 0) id476_imgs else character(0),
       thumbnail = paste0(ID89, "Thumbnail.png"),
+      aetiology = aetiology,  # 添加 aetiology
       desc = "InsDel39 does not have corresponding COSMIC ID83 signature"
     )
   } else {
     signature_groups[[ID89]] <- list(
       imgs = imgs, id83 = id83_imgs, id83_name = ID83,
       id476 = if (length(id476_imgs) > 0) id476_imgs else character(0),
-      thumbnail = paste0(ID89, "Thumbnail.png")
+      thumbnail = paste0(ID89, "Thumbnail.png"),
+      aetiology = aetiology  # 添加 aetiology
     )
   }
 }
@@ -79,6 +86,7 @@ server <- function(input, output, session){
           sig <- signature_groups[[group_name]]
           thumb <- sig$thumbnail
           
+          
           column(3,
                  div(class = "thumbnail-card",
                      h4(group_name),
@@ -88,8 +96,9 @@ server <- function(input, output, session){
                        div(style = "height:120px; line-height:120px; color:#95a5a6;", 
                            icon("image", style = "font-size:48px;"))
                      },
-                     actionButton(paste0("show_", group_name), "View Details",
-                                  class = "btn btn-info")
+                     
+                  actionButton(paste0("show_", group_name), "View Details",
+                               class = "btn btn-info")
                  )
           )
         })
@@ -109,6 +118,24 @@ server <- function(input, output, session){
       tagList(
         actionButton("back_to_list","← Back to List", class = "btn-back", style = "margin-bottom:20px;"),
         h2(current_group(), style = "color:#2c3e50; font-weight:600; margin-bottom:25px;"),
+        
+        # 显示 Proposed aetiology（新增）
+        if (!is.null(sig$aetiology) && !is.na(sig$aetiology) && nchar(sig$aetiology) > 0) {
+          div(style = "background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); 
+                    padding:20px; border-radius:12px; margin-bottom:25px; 
+                    border-left:5px solid #2ecc71; box-shadow: 0 2px 8px rgba(0,0,0,0.1);",
+              div(style = "display:flex; align-items:center; margin-bottom:10px;",
+                  icon("lightbulb", style = "font-size:24px; color:#27ae60; margin-right:12px;"),
+                  tags$span(style = "font-size:16px; color:#27ae60; font-weight:700; 
+                             text-transform:uppercase; letter-spacing:1px;",
+                            "Proposed Aetiology"
+                  )
+              ),
+              tags$p(style = "font-size:16px; color:#2c3e50; line-height:1.8; margin:0;",
+                     sig$aetiology
+              )
+          )
+        },
         
         # Koh89 Spectrum
         if (length(id89_imgs) >= 1 && file.exists(file.path("www", id89_imgs[1]))) {
@@ -203,11 +230,11 @@ server <- function(input, output, session){
           members_text <- paste(id83_info$members, collapse = ", ")
           thumbnail_path <- id83_info$thumbnail 
           
-
+          
           column(3,
                  div(class = "thumbnail-card",
                      h4(id83_name, style = "color:#27ae60;"),
-                    
+                     
                      
                      # 添加缩略图显示
                      if(!is.null(thumbnail_path)&&length(thumbnail_path)> 0 &&
@@ -222,9 +249,9 @@ server <- function(input, output, session){
                           icon("image", style = "font-size:48px;"),
                           br(),
                           tags$small("缩略图未找到")
-                          )
+                       )
                      },
-        
+                     
                      div(style = "background:#ecf0f1; padding:15px; border-radius:8px; margin-bottom:15px;",
                          div(style = "font-size:11px; color:#7f8c8d; margin-bottom:5px;", "MEMBERS"),
                          div(style = "font-size:12px; color:#34495e; font-weight:500;", members_text)
@@ -274,6 +301,20 @@ server <- function(input, output, session){
               
               div(class = "member-section",
                   div(class = "member-name", icon("chevron-right"), " ", member_name),
+                  
+                  # 显示 aetiology（新增）
+                  if (!is.null(sig$aetiology) && !is.na(sig$aetiology) && nchar(sig$aetiology) > 0) {
+                    div(style = "background:#fff3cd; padding:12px; border-radius:6px; 
+                    margin-bottom:15px; border-left:3px solid #ffc107;",
+                    tags$strong(style = "color:#856404; font-size:12px;",
+                                icon("lightbulb"), " Proposed Aetiology: "
+                    ),
+                    tags$span(style = "color:#856404; font-size:13px;",
+                              sig$aetiology
+                    )
+                    )
+                  },
+                  
                   fluidRow(
                     if (!is.null(koh89_spectrum) && file.exists(file.path("www", koh89_spectrum))) {
                       column(4,
@@ -375,5 +416,5 @@ server <- function(input, output, session){
       })
     })
   })
-
+  
 }

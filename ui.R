@@ -13,8 +13,8 @@ source("ui_components/about_tab.R")
 
 # Main UI
 ui <- navbarPage(
-  title = "Indel Signature Browser",
-  theme = NULL,  # 使用自定义样式
+  title = "Indel Signature Explorer",
+  theme = NULL, # 使用自定义样式
   id = "navbar",
 
   # Header: CSS and JavaScript dependencies

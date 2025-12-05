@@ -1,9 +1,9 @@
 id89_df  <- read.delim("./ID89_ID83_connection_example.txt",
-                 header = TRUE,
-                 stringsAsFactors = FALSE)
+                       header = TRUE,
+                       stringsAsFactors = FALSE)
 
 id476_df <- read.csv("./mSigHdp.indel476.final.signatures.csv",
-                header = TRUE, check.names = FALSE, stringsAsFactors = FALSE, row.names = NULL)
+                     header = TRUE, check.names = FALSE, stringsAsFactors = FALSE, row.names = NULL)
 
 ID476_list <- colnames(id476_df)
 all_pngs <- list.files("./www", pattern = "\\.png$", full.names = FALSE)
@@ -14,8 +14,8 @@ for (i in seq_len(nrow(id89_df ))) {
   ID83 <- id89_df $InDel83[i]
   ID476 <- if (i <= length(ID476_list)) ID476_list[i] else NA_character_
   
-  # 读取 Proposed aetiology（假设在第4列）
-  # 根据你的实际列名调整，可能是 id89_df $Aetiology 或 id89_df [,4]
+  # 读取 Proposed aetiology
+  # 根据你的实际列名调整
   aetiology <- if (ncol(id89_df ) >= 4) id89_df [i, 4] else"Unknown"
   
   imgs <- paste0(ID89, c("_signature.89spectrum.png","_89spectrumA.png","_89spectrumB.png","_89spectrumC.png"))
@@ -76,6 +76,15 @@ server <- function(input, output, session){
   current_group <- reactiveVal(NULL)
   current_id83 <- reactiveVal(NULL)
   
+  # ---------------- Home page navigation links ----------------
+  observeEvent(input$home_goto_koh89, {
+    updateNavbarPage(session, "navbar", selected = "Koh89 ")
+  })
+  
+  observeEvent(input$home_goto_cosmic83, {
+    updateNavbarPage(session, "navbar", selected = "COSMIC83 Classification")
+  })
+  
   # ---------------- Search 页面 ----------------
   search_signature <- function(search_term) {
     search_term <- trimws(search_term)
@@ -90,18 +99,25 @@ server <- function(input, output, session){
       return()
     }
     
-    # ---- 在 ID89 Browser 中匹配 ----
+    # ---- 在 ID89 Explorer 中匹配 ----
     matched89 <- grep(search_term, names(signature_groups),
                       ignore.case = TRUE, value = TRUE)
     
-    # ---- 在 ID83 Browser 中匹配（查成员 ID89 名）----
-    matched83 <- c()
+    # ---- 在 ID83 Explorer 中匹配（查成员 ID89 名）----
+    matched83_found <- character(0) # 初始化為空的文字向量
     for (g in names(id83_groups)) {
       members <- id83_groups[[g]]$members
       if (any(grepl(search_term, members, ignore.case = TRUE))) {
-        matched83 <- c(matched83, g)
+        matched83_found <- c(matched83_found, g)
       }
     }
+    
+    # 直接查 ID83 名称 (例如 C_ID1) 
+    matched83_names <- grep(search_term, names(id83_groups), 
+                            ignore.case = TRUE, value = TRUE)
+    
+    # 合并两者结果并去除重复
+    matched83 <- unique(c(matched83_found, matched83_names))
     
     # ---- 完全没找到 ----
     if (length(matched89) == 0 && length(matched83) == 0) {
@@ -117,13 +133,13 @@ server <- function(input, output, session){
     # ---- 同时匹配 ID89 + ID83 → 弹框让用户选 ----
     if (length(matched89) > 0 && length(matched83) > 0) {
       choices <- c(
-        paste0(matched89, "  →  Koh ID89 Browser"),
-        paste0(matched83, "  →  COSMIC ID83 Browser")
+        paste0(matched89, "  →  Koh ID89 Explorer"),
+        paste0(matched83, "  →  COSMIC ID83 Explorer")
       )
       
       showModal(modalDialog(
         title = "Multiple Matches Found",
-        tags$p(paste0("The signature '", search_term, "' appears in both browsers.")),
+        tags$p(paste0("The signature '", search_term, "' appears in both Explorers.")),
         radioButtons("select_search", label = NULL, choices = choices),
         easyClose = TRUE,
         footer = tagList(
@@ -136,7 +152,7 @@ server <- function(input, output, session){
     
     # ---- 只在 ID89 里匹配 ----
     if (length(matched89) > 0) {
-      updateNavbarPage(session, "navbar", selected = "Koh ID89 Browser")
+      updateNavbarPage(session, "navbar", selected = "Koh ID89 Explorer")
       current_group(matched89[1])
       updateTextInput(session, "search_input", value = "")
       return()
@@ -144,7 +160,7 @@ server <- function(input, output, session){
     
     # ---- 只在 ID83 里匹配 ----
     if (length(matched83) > 0) {
-      updateNavbarPage(session, "navbar", selected = "COSMIC ID83 Browser")
+      updateNavbarPage(session, "navbar", selected = "COSMIC ID83 Explorer")
       current_id83(matched83[1])
       updateTextInput(session, "search_input", value = "")
       return()
@@ -155,17 +171,17 @@ server <- function(input, output, session){
     choice <- input$select_search
     if (is.null(choice)) return()
     
-    # 用户选择跳到 ID89 Browser
-    if (grepl("Koh ID89 Browser$", choice)) {
-      sig89 <- sub("  →  Koh ID89 Browser$", "", choice)
-      updateNavbarPage(session, "navbar", selected = "Koh ID89 Browser")
+    # 用户选择跳到 ID89 Explorer
+    if (grepl("Koh ID89 Explorer$", choice)) {
+      sig89 <- sub("  →  Koh ID89 Explorer$", "", choice)
+      updateNavbarPage(session, "navbar", selected = "Koh ID89 Explorer")
       current_group(sig89)
     }
     
-    # 用户选择跳到 ID83 Browser
-    if (grepl("COSMIC ID83 Browser$", choice)) {
-      sig83 <- sub("  →  COSMIC ID83 Browser$", "", choice)
-      updateNavbarPage(session, "navbar", selected = "COSMIC ID83 Browser")
+    # 用户选择跳到 ID83 Explorer
+    if (grepl("COSMIC ID83 Explorer$", choice)) {
+      sig83 <- sub("  →  COSMIC ID83 Explorer$", "", choice)
+      updateNavbarPage(session, "navbar", selected = "COSMIC ID83 Explorer")
       current_id83(sig83)
     }
     
@@ -175,8 +191,8 @@ server <- function(input, output, session){
   observeEvent(input$search_btn, {
     search_signature(input$search_input)
   })
-
-  # ---------------- Signature Browser 页面 ----------------
+  
+  # ---------------- Signature Explorer 页面 ----------------
   output$signature_display <- renderUI({
     if (is.null(current_group())) {
       fluidRow(
@@ -197,8 +213,8 @@ server <- function(input, output, session){
                            icon("image", style = "font-size:48px;"))
                      },
                      
-                  actionButton(paste0("show_", group_name), "View Details",
-                               class = "btn btn-info")
+                     actionButton(paste0("show_", group_name), "View Details",
+                                  class = "btn btn-info")
                  )
           )
         })
@@ -219,7 +235,7 @@ server <- function(input, output, session){
         actionButton("back_to_list","← Back to List", class = "btn-back", style = "margin-bottom:20px;"),
         h2(current_group(), style = "color:#2c3e50; font-weight:600; margin-bottom:25px;"),
         
-        # 显示 Proposed aetiology（新增）
+        # 显示 Proposed aetiology
         if (!is.null(sig$aetiology) && !is.na(sig$aetiology) && nchar(sig$aetiology) > 0) {
           div(style = "background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); 
                     padding:20px; border-radius:12px; margin-bottom:25px; 
@@ -319,7 +335,7 @@ server <- function(input, output, session){
     }
   })
   
-  # ---------------- ID83 Browser 页面 ----------------
+  # ---------------- ID83 Explorer 页面 ----------------
   output$id83_display <- renderUI({
     if (is.null(current_id83())) {
       
@@ -330,34 +346,28 @@ server <- function(input, output, session){
           members_text <- paste(id83_info$members, collapse = ", ")
           thumbnail_path <- id83_info$thumbnail 
           
-          
           column(3,
                  div(class = "thumbnail-card",
-                     h4(id83_name, style = "color:#27ae60;"),
-                     
-                     
-                     # 添加缩略图显示
-                     if(!is.null(thumbnail_path)&&length(thumbnail_path)> 0 &&
-                        file.exists(file.path("www",thumbnail_path))){
-                       tags$img(src = thumbnail_path,
-                                style = "width:100%; max-width:200px; height:auto; 
-                              margin-bottom:15px; border-radius:8px; 
-                              border:2px solid #e8eaed;")
-                     } else {
-                       div(style = "height:120px; line-height:120px; color:#95a5a6; 
-                          margin-bottom:15px;", 
-                          icon("image", style = "font-size:48px;"),
-                          br(),
-                          tags$small("缩略图未找到")
-                       )
-                     },
-                     
-                     div(style = "background:#ecf0f1; padding:15px; border-radius:8px; margin-bottom:15px;",
-                         div(style = "font-size:11px; color:#7f8c8d; margin-bottom:5px;", "MEMBERS"),
-                         div(style = "font-size:12px; color:#34495e; font-weight:500;", members_text)
-                     ),
-                     actionButton(paste0("show_id83_", id83_name), "View Details",
-                                  class = "btn btn-success")
+                    
+                     actionLink(inputId = paste0("show_id83_", id83_name),
+                                label = tagList(
+                                  h4(id83_name, style = "color:#27ae60!important; margin-top:0; font-weight:700;"),
+                                  
+                                  if(!is.null(thumbnail_path) && length(thumbnail_path) > 0 && file.exists(file.path("www", thumbnail_path))){
+                                    tags$img(src = thumbnail_path, style = "width:100%; max-width:200px; height:auto; margin-bottom:15px; border-radius:8px; border:2px solid #e8eaed; cursor:pointer;")
+                                  } else {
+                                    div(style = "height:120px; line-height:120px; color:#95a5a6; margin-bottom:15px; cursor:pointer;", 
+                                        icon("image", style = "font-size:48px;"), br(), tags$small("No Thumbnail"))
+                                  },
+                                  
+                                  div(style = "background:#ecf0f1; padding:15px; border-radius:8px; margin-bottom:15px;",
+                                      div(style = "font-size:11px; color:#7f8c8d; margin-bottom:5px;", "MEMBERS"),
+                                      div(style = "font-size:12px; color:#34495e; font-weight:500;", members_text)
+                                  )
+                                ),
+                                style = "text-decoration: none; color: inherit; display: block;"
+                     )
+                     # 已移除 View Details 按鈕
                  )
           )
         })
@@ -402,7 +412,7 @@ server <- function(input, output, session){
               div(class = "member-section",
                   div(class = "member-name", icon("chevron-right"), " ", member_name),
                   
-                  # 显示 aetiology（新增）
+                  # 显示 aetiology
                   if (!is.null(sig$aetiology) && !is.na(sig$aetiology) && nchar(sig$aetiology) > 0) {
                     div(style = "background:#fff3cd; padding:12px; border-radius:6px; 
                     margin-bottom:15px; border-left:3px solid #ffc107;",

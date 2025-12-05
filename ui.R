@@ -1,15 +1,18 @@
 library(shiny)
 library(shinyjs)
 
+h3_style = "color:#34495e; font-size:18px; line-height:1.8; margin-bottom:20px;"
+
 ui <- navbarPage(
-  title = "Indel Signature Browser",
-  theme = NULL,  # 使用自定义样式
+  title = "Indel Signature Explorer",
+  theme = NULL, # 使用自定义样式
   id = "navbar",
   
   # 添加自定义 CSS
   header = tags$head(
     useShinyjs(),
-    tags$style(HTML("
+    tags$style(HTML(
+      "
       /* 全局样式 - 明亮主题 */
       body { 
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -231,7 +234,7 @@ ui <- navbarPage(
         color: white;
         border-radius: 16px 16px 0 0;
       }
-          /* 搜索页面样式 - 全面美化 */
+                /* 搜索页面样式 - 全面美化 */
     .search-page-container {
       display: flex;
       flex-direction: column;
@@ -440,49 +443,87 @@ ui <- navbarPage(
         margin-left: 0;
       }
     }
-      
-      
-
-    "))
+    "
+    ))
   ),
   
   # ========== Home Page ==========
+  
   tabPanel(
     "Home",
     icon = icon("house"),
-    div(class = "img-container",
-        h1("Small Insertions and Deletions (ID) Signatures",
-           style = "color:#2c3e50; font-weight:700; margin-bottom:25px;"),
-        h3("Small insertions and deletions (ID), also known as indels, are defined as the incorporation or loss of small fragments of DNA (usually between 1 and 50 base pairs) in a specific genomic location.Although there is no single intuitive and naturally constrained set of ID mutation types (as there arguably are for single base substitutions and doublet base substitutions), a compilation of 83 different types considering size, nucleotides affected and presence on repetitive and/or microhomology regions was used to extract mutational signatures. It can be found here.Click on any signature below to learn more about its details..",
-           style = "color:#34495e; font-size:18px; line-height:1.8; margin-bottom:20px;"),
-        h3("Signature extraction methodsWith a few exceptions, the current set of reference signatures were extracted using SigProfiler (as described in Alexandrov, L.B. et al., 2020) from the 2,780 whole-genome variant calls produced by the ICGC/TCGA Pan Cancer Analysis of Whole Genomes (PCAWG) Network. The stability and reproducibility of the signatures were assessed on somatic mutations from an additional 1,865 whole genomes and 19,184 exomes. All input data and references for original sources are available from synapse.org ID syn11801889.",
-           style = "color:#34495e; font-size:18px; line-height:1.8; margin-bottom:20px;"),
-        h3("Please select a group from the navigation bar above.",
-           style = "color:#3498db; font-size:20px; margin-top:25px; font-weight:600;")
+    div(
+      class = "img-container",
+      h1(
+        "Mutational Signatures of Indels — Small Insertions and Deletions",
+        style = "color:#2c3e50; font-weight:700; margin-bottom:25px;"
+      ),
+      h3(
+        paste(
+          "Indels are mutations that ",
+          "add or delete small sequences of DNA (conventionally < ~50 base pairs long).",
+          "There is no single intuitive and naturally",
+          "constrained classification of indel mutation types (as there arguably is for single base mutations)",
+          "but two classifications are useful and widely used:"
+        ),
+        style = h3_style
+      ),
+      tags$ul(
+        style = h3_style,
+        tags$li(
+          tags$strong("COSMIC83:"),
+          paste(
+            " The most widely used classification, which classifies indels into 83 types.",
+            "Described in Alexandrov et al., 2020 and used on the COSMIC mutational signatures web site."
+          )
+        ),
+        tags$li(
+          tags$strong("Koh89:"),
+          paste(
+            " New indel classifiction scheme (Koh et al., 2025), which classifies indels in 89 type.",
+            "Provides more informative granularity for indels in homopolymers (e.g. ATTTTTG → ATTTTG).",
+            "Koh et al., 2025 also present an even more granular classifiction of 476 mutation types."
+          )
+        )
+      ),
+      h3(
+        paste(
+          "With a few exceptions, the reference signatures on this web site were extracted using both",
+          "SigProfiler (as described in Alexandrov et al., 2020) and mSigHdp (Liu et al., 2023) from the",
+          "2,780 whole-genome from ICGC/TCGA Pan Cancer Analysis of Whole Genomes (PCAWG) Network and",
+          ">4,000 whole-genome from Hartwig Medical Foundation."
+        ),
+        style = h3_style
+      ),
+      h3(
+        "Please select a group from the navigation bar above.",
+        style = "color:#3498db; font-size:20px; margin-top:25px; font-weight:600;"
+      )
     )
   ),
   
-  # ========== Koh ID89 Browser ==========
+  # ========== Koh ID89 Explorer ==========
   tabPanel(
-    "Koh ID89 Browser",
+    "Koh ID89 Explorer",
     icon = icon("dna"),
     # 顶部控制面板
-    div(class = "control-panel",
-        checkboxGroupInput(
-          inputId = "show_types",
-          label = "Select signature types to display:",
-          choices = c("Koh89" = "ID89", "COSMIC83" = "ID83", "Koh476" = "ID476"),
-          selected = c("ID89", "ID83", "ID476"),
-          inline = TRUE
-        )
+    div(
+      class = "control-panel",
+      checkboxGroupInput(
+        inputId = "show_types",
+        label = "Select signature types to display:",
+        choices = c("Koh89" = "ID89", "COSMIC83" = "ID83", "Koh476" = "ID476"),
+        selected = c("ID89", "ID83", "ID476"),
+        inline = TRUE
+      )
     ),
     # 主内容
     uiOutput("signature_display")
   ),
   
-  # ========== COSMIC ID83 Browser ==========
+  # ========== COSMIC ID83 Explorer ==========
   tabPanel(
-    "COSMIC ID83 Browser",
+    "COSMIC ID83 Explorer",
     icon = icon("layer-group"),
     uiOutput("id83_display")
   ),
@@ -519,58 +560,87 @@ ui <- navbarPage(
                   tags$span(class = "example-tag", onclick = "Shiny.setInputValue('example_click', 'InsDel1a', {priority: 'event'})", "InsDel1a"),
                   tags$span(class = "example-tag", onclick = "Shiny.setInputValue('example_click', 'InsDel2b', {priority: 'event'})", "InsDel2b"),
                   tags$span(class = "example-tag", onclick = "Shiny.setInputValue('example_click', 'InsDel3', {priority: 'event'})", "InsDel3"),
-                  tags$span(class = "example-tag", onclick = "Shiny.setInputValue('example_click', 'InsDel10', {priority: 'event'})", "InsDel10"),
-                  tags$span(class = "example-tag", onclick = "Shiny.setInputValue('example_click', 'InsDel39', {priority: 'event'})", "InsDel39")
+                  tags$span(class = "example-tag", onclick = "Shiny.setInputValue('example_click', 'C_ID8', {priority: 'event'})", "C_ID8"),
+                  tags$span(class = "example-tag", onclick = "Shiny.setInputValue('example_click', 'H_ID29', {priority: 'event'})", "H_ID29")
                 )
             )
         )
     )
   ),
-    
+  
+  
   
   # ========== About ==========
   tabPanel(
     "About",
     icon = icon("info-circle"),
     fluidRow(
-      column(10, offset = 1,
-             div(class = "img-container",
-                 h2("About", 
-                    style = "color:#2c3e50; font-weight:700; margin-bottom:35px; text-align:center; font-size:32px;"),
-                 
-                 h3("Contact Us", 
-                    style = "color:#3498db; font-weight:700; margin-top:25px; margin-bottom:15px; font-size:24px;"),
-                 tags$p(style = "font-size:17px; line-height:1.9; color:#555;",
-                        "If you experience any issues or have suggestions while visiting this website, don't hesitate to reach out to us."
-                 ),
-                 
-                 hr(style = "margin: 35px 0; border-top: 2px solid #3498db; opacity: 0.3;"),
-                 
-                 h3("Main Contributors", 
-                    style = "color:#2ecc71; font-weight:700; margin-top:25px; margin-bottom:15px; font-size:24px;"),
-                 tags$p(style = "font-size:17px; line-height:2.2; color:#555;",
-                        "• Xueming Wu", tags$br(),
-                        "• Mo Liu", tags$br(),
-                        "• Steverozen"
-                 ),
-                 
-                 hr(style = "margin: 35px 0; border-top: 2px solid #2ecc71; opacity: 0.3;"),
-                 
-                 h3("Email", 
-                    style = "color:#e74c3c; font-weight:700; margin-top:25px; margin-bottom:15px; font-size:24px;"),
-                 tags$p(style = "font-size:17px; line-height:1.9; color:#555;",
-                        icon("envelope", style = "color:#e74c3c; margin-right:10px; font-size:20px;"),
-                        tags$a(href = "mailto:wuxm8523@gmail.com", 
-                               "wuxm8523@gmail.com",
-                               style = "color:#3498db; text-decoration:none; font-weight:600;")
-                 ),
-                 
-                 hr(style = "margin: 45px 0; border-top: 1px solid #bdc3c7;"),
-                 
-                 tags$p(style = "text-align:center; color:#7f8c8d; margin-top:40px; font-size:15px; font-weight:500;",
-                        "© 2025 Indel Signature Browser. All rights reserved."
-                 )
-             )
+      column(
+        10,
+        offset = 1,
+        div(
+          class = "img-container",
+          h2(
+            "About",
+            style = "color:#2c3e50; font-weight:700; margin-bottom:35px; text-align:center; font-size:32px;"
+          ),
+          
+          h3(
+            "Contact Us",
+            style = "color:#3498db; font-weight:700; margin-top:25px; margin-bottom:15px; font-size:24px;"
+          ),
+          tags$p(
+            style = "font-size:17px; line-height:1.9; color:#555;",
+            "If you experience any issues or have suggestions while visiting this website, don't hesitate to reach out to us."
+          ),
+          
+          hr(
+            style = "margin: 35px 0; border-top: 2px solid #3498db; opacity: 0.3;"
+          ),
+          
+          h3(
+            "Main Contributors",
+            style = "color:#2ecc71; font-weight:700; margin-top:25px; margin-bottom:15px; font-size:24px;"
+          ),
+          tags$p(
+            style = "font-size:17px; line-height:2.2; color:#555;",
+            "• Xueming Wu",
+            tags$br(),
+            "• Mo Liu",
+            tags$br(),
+            "• Steve G. Rozen"
+          ),
+          
+          hr(
+            style = "margin: 35px 0; border-top: 2px solid #2ecc71; opacity: 0.3;"
+          ),
+          
+          h3(
+            "Email",
+            style = "color:#e74c3c; font-weight:700; margin-top:25px; margin-bottom:15px; font-size:24px;"
+          ),
+          tags$p(
+            style = "font-size:17px; line-height:1.9; color:#555;",
+            icon(
+              "envelope",
+              style = "color:#e74c3c; margin-right:10px; font-size:20px;"
+            ),
+            tags$a(
+              href = "mailto:wuxm8523@gmail.com",
+              "wuxm8523@gmail.com",
+              href = "mailto:mo.liu@gzhmu.edu.cn",
+              "mo.liu@gzhmu.edu.cn",
+              style = "color:#3498db; text-decoration:none; font-weight:600;"
+            )
+          ),
+          
+          hr(style = "margin: 45px 0; border-top: 1px solid #bdc3c7;"),
+          
+          tags$p(
+            style = "text-align:center; color:#7f8c8d; margin-top:40px; font-size:15px; font-weight:500;",
+            "© 2025 Indel Signature Explorer. All rights reserved."
+          )
+        )
       )
     )
   )

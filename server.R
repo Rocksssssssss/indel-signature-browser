@@ -14,8 +14,8 @@ for (i in seq_len(nrow(id89_df ))) {
   ID83 <- id89_df $InDel83[i]
   ID476 <- if (i <= length(ID476_list)) ID476_list[i] else NA_character_
   
-  # 读取 Proposed aetiology
-  # 根据你的实际列名调整
+  # 读取 Proposed aetiology（假设在第4列）
+  # 根据你的实际列名调整，可能是 id89_df $Aetiology 或 id89_df [,4]
   aetiology <- if (ncol(id89_df ) >= 4) id89_df [i, 4] else"Unknown"
   
   imgs <- paste0(ID89, c("_signature.89spectrum.png","_89spectrumA.png","_89spectrumB.png","_89spectrumC.png"))
@@ -78,11 +78,11 @@ server <- function(input, output, session){
   
   # ---------------- Home page navigation links ----------------
   observeEvent(input$home_goto_koh89, {
-    updateNavbarPage(session, "navbar", selected = "Koh89 ")
+    updateNavbarPage(session, "navbar", selected = "Koh ID89 Explorer")
   })
   
   observeEvent(input$home_goto_cosmic83, {
-    updateNavbarPage(session, "navbar", selected = "COSMIC83 Classification")
+    updateNavbarPage(session, "navbar", selected = "COSMIC ID83 Explorer")
   })
   
   # ---------------- Search 页面 ----------------
@@ -104,21 +104,17 @@ server <- function(input, output, session){
                       ignore.case = TRUE, value = TRUE)
     
     # ---- 在 ID83 Explorer 中匹配（查成员 ID89 名）----
-    matched83_found <- character(0) # 初始化為空的文字向量
+    matched83_found <- character(0)
     for (g in names(id83_groups)) {
       members <- id83_groups[[g]]$members
       if (any(grepl(search_term, members, ignore.case = TRUE))) {
         matched83_found <- c(matched83_found, g)
       }
     }
-    
-    # 直接查 ID83 名称 (例如 C_ID1) 
     matched83_names <- grep(search_term, names(id83_groups), 
                             ignore.case = TRUE, value = TRUE)
     
-    # 合并两者结果并去除重复
     matched83 <- unique(c(matched83_found, matched83_names))
-    
     # ---- 完全没找到 ----
     if (length(matched89) == 0 && length(matched83) == 0) {
       showModal(modalDialog(
@@ -192,7 +188,7 @@ server <- function(input, output, session){
     search_signature(input$search_input)
   })
   
-  # ---------------- Signature Explorer 页面 ----------------
+  # ---------------- Signature Explorer 页面 (Koh ID89) ----------------
   output$signature_display <- renderUI({
     if (is.null(current_group())) {
       fluidRow(
@@ -235,7 +231,7 @@ server <- function(input, output, session){
         actionButton("back_to_list","← Back to List", class = "btn-back", style = "margin-bottom:20px;"),
         h2(current_group(), style = "color:#2c3e50; font-weight:600; margin-bottom:25px;"),
         
-        # 显示 Proposed aetiology
+        # 显示 Proposed aetiology（新增）
         if (!is.null(sig$aetiology) && !is.na(sig$aetiology) && nchar(sig$aetiology) > 0) {
           div(style = "background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); 
                     padding:20px; border-radius:12px; margin-bottom:25px; 
@@ -338,20 +334,24 @@ server <- function(input, output, session){
   # ---------------- ID83 Explorer 页面 ----------------
   output$id83_display <- renderUI({
     if (is.null(current_id83())) {
-      
-      
       fluidRow(
         lapply(names(id83_groups), function(id83_name){
           id83_info <- id83_groups[[id83_name]]
           members_text <- paste(id83_info$members, collapse = ", ")
           thumbnail_path <- id83_info$thumbnail 
           
+          # 彩色标签生成
+          member_badges <- lapply(id83_info$members, function(m) {
+            tags$span(m, style = "display:inline-block; background-color:#3498db !important; color:#ffffff !important; padding:3px 8px; border-radius:12px; font-size:11px; margin-right:4px; margin-bottom:4px; font-weight:600; box-shadow: 0 2px 4px rgba(52, 152, 219, 0.2);")
+          })
+          
           column(3,
                  div(class = "thumbnail-card",
-                    
+                     # 使用 actionLink 包裹
                      actionLink(inputId = paste0("show_id83_", id83_name),
                                 label = tagList(
-                                  h4(id83_name, style = "color:#27ae60!important; margin-top:0; font-weight:700;"),
+                                  
+                                  h4(id83_name, style = "color:#27ae60 !important; margin-top:0; font-weight:700;"),
                                   
                                   if(!is.null(thumbnail_path) && length(thumbnail_path) > 0 && file.exists(file.path("www", thumbnail_path))){
                                     tags$img(src = thumbnail_path, style = "width:100%; max-width:200px; height:auto; margin-bottom:15px; border-radius:8px; border:2px solid #e8eaed; cursor:pointer;")
@@ -360,14 +360,17 @@ server <- function(input, output, session){
                                         icon("image", style = "font-size:48px;"), br(), tags$small("No Thumbnail"))
                                   },
                                   
-                                  div(style = "background:#ecf0f1; padding:15px; border-radius:8px; margin-bottom:15px;",
-                                      div(style = "font-size:11px; color:#7f8c8d; margin-bottom:5px;", "MEMBERS"),
-                                      div(style = "font-size:12px; color:#34495e; font-weight:500;", members_text)
+                                  # 2. Members 区块
+                                  div(style = "background:#ecf0f1 !important; padding:15px; border-radius:8px; margin-bottom:15px; text-align:left;",
+                                      
+                                      div(style = "font-size:11px; color:#7f8c8d !important; margin-bottom:5px;", "MEMBERS"),
+                                      
+                                      # 这里放回 members_text
+                                      div(style = "font-size:12px; color:#34495e !important; font-weight:500; line-height:1.4;", members_text)
                                   )
                                 ),
                                 style = "text-decoration: none; color: inherit; display: block;"
                      )
-                     # 已移除 View Details 按鈕
                  )
           )
         })
@@ -412,7 +415,7 @@ server <- function(input, output, session){
               div(class = "member-section",
                   div(class = "member-name", icon("chevron-right"), " ", member_name),
                   
-                  # 显示 aetiology
+                  # 显示 aetiology（新增）
                   if (!is.null(sig$aetiology) && !is.na(sig$aetiology) && nchar(sig$aetiology) > 0) {
                     div(style = "background:#fff3cd; padding:12px; border-radius:6px; 
                     margin-bottom:15px; border-left:3px solid #ffc107;",
@@ -455,26 +458,6 @@ server <- function(input, output, session){
                     }
                   )
               )
-            })
-        ),
-        
-        # Koh476
-        div(class = "id83-section",
-            div(class = "id83-label", icon("microscope"), " Koh476 Signature Spectrum"),
-            lapply(members, function(member_name){
-              sig <- signature_groups[[member_name]]
-              if (is.null(sig) || length(sig$id476) == 0) return(NULL)
-              
-              koh476_img <- sig$id476[1]
-              if (!is.null(koh476_img) && file.exists(file.path("www", koh476_img))) {
-                div(class = "member-section",
-                    div(class = "member-name", icon("chevron-right"), " ", member_name),
-                    tags$img(src = koh476_img, class = "signature-img",
-                             style = "max-width:100%; width:100%;",
-                             onclick = sprintf("Shiny.setInputValue('%s', new Date().getTime());", 
-                                               paste0("img_", koh476_img)))
-                )
-              }
             })
         )
       )

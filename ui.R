@@ -234,215 +234,295 @@ ui <- navbarPage(
         color: white;
         border-radius: 16px 16px 0 0;
       }
-                /* 搜索页面样式 - 全面美化 */
-    .search-page-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 80vh;
-      padding: 50px 20px;
-      position: relative;
-      overflow: hidden;
-    }
+      
+.search-page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  padding: 50px 20px;
+  position: relative;
+  overflow: hidden;
+}
 
-    .search-page-container::before {
-      content: '';
-      position: absolute;
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(52, 152, 219, 0.1) 0%, transparent 70%);
-      border-radius: 50%;
-      top: -200px;
-      left: -200px;
-      animation: float 20s ease-in-out infinite;
-    }
+/* 添加装饰性背景元素 */
+.search-page-container::before {
+  content: '';
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(52, 152, 219, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  top: -200px;
+  left: -200px;
+  animation: float 20s ease-in-out infinite;
+}
 
-    .search-page-container::after {
-      content: '';
-      position: absolute;
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(46, 204, 113, 0.1) 0%, transparent 70%);
-      border-radius: 50%;
-      bottom: -150px;
-      right: -150px;
-      animation: float 15s ease-in-out infinite reverse;
-    }
+.search-page-container::after {
+  content: '';
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(46, 204, 113, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  bottom: -150px;
+  right: -150px;
+  animation: float 15s ease-in-out infinite reverse;
+}
 
-    @keyframes float {
-      0%, 100% { transform: translate(0, 0) rotate(0deg); }
-      33% { transform: translate(30px, -30px) rotate(120deg); }
-      66% { transform: translate(-20px, 20px) rotate(240deg); }
-    }
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(30px, -30px) rotate(120deg); }
+  66% { transform: translate(-20px, 20px) rotate(240deg); }
+}
 
-    .search-box-large {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-radius: 30px;
-      padding: 60px 50px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-      max-width: 750px;
-      width: 100%;
-      text-align: center;
-      position: relative;
-      z-index: 1;
-      transition: all 0.3s ease;
-      border: 1px solid rgba(255, 255, 255, 0.8);
-    }
+.search-box-large {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 30px;
+  padding: 60px 50px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  max-width: 750px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
 
-    .search-box-large:hover {
-      box-shadow: 0 25px 80px rgba(52, 152, 219, 0.2);
-      transform: translateY(-5px);
-    }
+.search-box-large:hover {
+  box-shadow: 0 25px 80px rgba(52, 152, 219, 0.2);
+  transform: translateY(-5px);
+}
 
-    .search-icon-decoration {
-      font-size: 60px;
-      margin-bottom: 20px;
-      background: linear-gradient(135deg, #3498db 0%, #2ecc71 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: pulse 2s ease-in-out infinite;
-    }
+/* 搜索图标装饰 */
+.search-icon-decoration {
+  font-size: 60px;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #3498db 0%, #2ecc71 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: pulse 2s ease-in-out infinite;
+}
 
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.1); opacity: 0.8; }
-    }
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
 
-    .search-title {
-      font-size: 42px;
-      font-weight: 800;
-      color: #2c3e50;
-      margin-bottom: 15px;
-      background: linear-gradient(135deg, #3498db 0%, #2ecc71 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: 0px;
-      text-shadow: 0 2px 10px rgba(52, 152, 219, 0.1);
-    }
+.search-title {
+  font-size: 42px;
+  font-weight: 800;
+  color: #2c3e50;
+  margin-bottom: 15px;
+  background: linear-gradient(135deg, #3498db 0%, #2ecc71 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -1px;
+  text-shadow: 0 2px 10px rgba(52, 152, 219, 0.1);
+}
 
-    .search-subtitle {
-      font-size: 18px;
-      color: #7f8c8d;
-      margin-bottom: 45px;
-      font-weight: 400;
-      line-height: 1.6;
-    }
+.search-subtitle {
+  font-size: 18px;
+  color: #7f8c8d;
+  margin-bottom: 45px;
+  font-weight: 400;
+  line-height: 1.6;
+}
 
-    .search-input-container {
-      display: flex;
-      align-items: center;
-      background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-      border-radius: 60px;
-      padding: 10px 15px;
-      margin-bottom: 30px;
-      border: 3px solid transparent;
-      background-clip: padding-box;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-    }
+/* 搜索输入容器 */
+.search-input-container {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  border-radius: 60px;
+  padding: 10px 15px;
+  margin-bottom: 30px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
 
-    .search-input-container::before {
-      content: '';
-      position: absolute;
-      top: -3px;
-      left: -3px;
-      right: -3px;
-      bottom: -3px;
-      background: linear-gradient(135deg, #3498db 0%, #2ecc71 100%);
-      border-radius: 60px;
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      z-index: -1;
-    }
+.search-input-container::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  background: linear-gradient(135deg, #3498db 0%, #2ecc71 100%);
+  border-radius: 60px;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: -1;
+}
 
-    .search-input-container:focus-within::before {
-      opacity: 1;
-    }
+.search-input-container:focus-within::before {
+  opacity: 1;
+}
 
-    .search-input-container:focus-within {
-      transform: scale(1.03);
-      box-shadow: 0 15px 40px rgba(52, 152, 219, 0.25);
-    }
+.search-input-container:focus-within {
+  transform: scale(1.03);
+  box-shadow: 0 15px 40px rgba(52, 152, 219, 0.25);
+}
 
-    .search-input-large {
-      flex: 1;
-      background: transparent !important;
-      border: none !important;
-      padding: 18px 25px !important;
-      font-size: 18px !important;
-      color: #2c3e50 !important;
-      font-weight: 500;
-    }
+.search-input-large {
+  flex: 1;
+  background: transparent !important;
+  border: none !important;
+  padding: 18px 25px !important;
+  font-size: 18px !important;
+  color: #2c3e50 !important;
+  font-weight: 500;
+}
 
-    .search-input-large::placeholder {
-      color: #95a5a6;
-      font-weight: 400;
-    }
+.search-input-large:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
 
-    .search-btn-large {
-      background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
-      border: none !important;
-      color: white !important;
-      padding: 18px 40px !important;
-      border-radius: 50px !important;
-      font-size: 16px !important;
-      font-weight: 700 !important;
-      transition: all 0.3s ease;
-      box-shadow: 0 6px 20px rgba(52, 152, 219, 0.35);
-      margin-left: 10px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
+.search-input-large::placeholder {
+  color: #95a5a6;
+  font-weight: 400;
+}
 
-    .search-examples {
-      margin-top: 35px;
-      padding-top: 30px;
-      border-top: 2px dashed rgba(52, 152, 219, 0.2);
-    }
+/* 搜索按钮 */
+.search-btn-large {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
+  border: none !important;
+  color: white !important;
+  padding: 18px 40px !important;
+  border-radius: 50px !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(52, 152, 219, 0.35);
+  margin-left: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
 
-    .example-tag {
-      display: inline-block;
-      background: linear-gradient(135deg, #ecf0f1 0%, #ffffff 100%);
-      padding: 12px 24px;
-      border-radius: 25px;
-      margin: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      color: #2c3e50;
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      border: 2px solid #ecf0f1;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      position: relative;
-      overflow: hidden;
-    }
+.search-btn-large:hover {
+  background: linear-gradient(135deg, #2980b9 0%, #3498db 100%) !important;
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 30px rgba(52, 152, 219, 0.5);
+}
 
-    .search-hint {
-      margin-top: 25px;
-      font-size: 13px;
-      color: #95a5a6;
-      font-style: italic;
-    }
+.search-btn-large:active {
+  transform: translateY(-1px) scale(1.02);
+}
 
-    @media (max-width: 768px) {
-      .search-box-large {
-        padding: 40px 30px;
-      }
-      .search-title {
-        font-size: 32px;
-      }
-      .search-input-container {
-        flex-direction: column;
-        gap: 15px;
-      }
-      .search-btn-large {
-        width: 100%;
-        margin-left: 0;
-      }
-    }
+/* 搜索示例区域 */
+.search-examples {
+  margin-top: 35px;
+  padding-top: 30px;
+  border-top: 2px dashed rgba(52, 152, 219, 0.2);
+}
+
+.search-examples-title {
+  font-size: 15px;
+  color: #7f8c8d;
+  margin-bottom: 18px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* 示例标签 */
+.example-tag {
+  display: inline-block;
+  background: linear-gradient(135deg, #ecf0f1 0%, #ffffff 100%);
+  padding: 12px 24px;
+  border-radius: 25px;
+  margin: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c3e50;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid #ecf0f1;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.example-tag::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+  transition: left 0.5s;
+}
+
+.example-tag:hover::before {
+  left: 100%;
+}
+
+.example-tag:hover {
+  background: linear-gradient(135deg, #3498db 0%, #2ecc71 100%);
+  color: white;
+  transform: translateY(-4px) scale(1.08);
+  box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4);
+  border-color: #3498db;
+}
+
+.example-tag:active {
+  transform: translateY(-2px) scale(1.05);
+}
+
+/* 快捷键提示 */
+.search-hint {
+  margin-top: 25px;
+  font-size: 13px;
+  color: #95a5a6;
+  font-style: italic;
+}
+
+.search-hint kbd {
+  background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  border: 1px solid #1a252f;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .search-box-large {
+    padding: 40px 30px;
+  }
+  
+  .search-title {
+    font-size: 32px;
+  }
+  
+  .search-input-container {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .search-btn-large {
+    width: 100%;
+    margin-left: 0;
+  }
+  
+  .example-tag {
+    margin: 5px;
+    padding: 10px 18px;
+    font-size: 13px;
+  }
+}
     "
     ))
   ),
@@ -528,16 +608,21 @@ ui <- navbarPage(
     uiOutput("id83_display")
   ),
   
-  # ========== Search Page（独立搜索页）==========
+  # ========== Search Page ==========
   tabPanel(
     "Search",
     icon = icon("search"),
     div(class = "search-page-container",
         div(class = "search-box-large",
+            # 搜索图标装饰
+            div(class = "search-icon-decoration",
+                icon("magnifying-glass")
+            ),
+            
             # 标题
-            h1(class = "search-title", "Search Signatures"),
+            h1(class = "search-title", "Find Your Signature"),
             p(class = "search-subtitle", 
-              "Enter a signature name to quickly find and view its details"),
+              "Quickly search and explore indel signatures from our comprehensive database"),
             
             # 搜索框
             div(class = "search-input-container",
@@ -545,7 +630,7 @@ ui <- navbarPage(
                   id = "search_input",
                   type = "text",
                   class = "search-input-large",
-                  placeholder = "Type signature name (e.g., InsDel1a, InsDel2b)..."
+                  placeholder = "Enter signature name (e.g., InsDel1a, InsDel2b)..."
                 ),
                 actionButton("search_btn",
                              "Search",
@@ -555,21 +640,35 @@ ui <- navbarPage(
             
             # 搜索示例
             div(class = "search-examples",
-                p(class = "search-examples-title", "Try searching:"),
+                p(class = "search-examples-title", 
+                  icon("lightbulb"), " Quick Examples"),
                 div(
-                  tags$span(class = "example-tag", onclick = "Shiny.setInputValue('example_click', 'InsDel1a', {priority: 'event'})", "InsDel1a"),
-                  tags$span(class = "example-tag", onclick = "Shiny.setInputValue('example_click', 'InsDel2b', {priority: 'event'})", "InsDel2b"),
-                  tags$span(class = "example-tag", onclick = "Shiny.setInputValue('example_click', 'InsDel3', {priority: 'event'})", "InsDel3"),
-                  tags$span(class = "example-tag", onclick = "Shiny.setInputValue('example_click', 'C_ID8', {priority: 'event'})", "C_ID8"),
-                  tags$span(class = "example-tag", onclick = "Shiny.setInputValue('example_click', 'H_ID29', {priority: 'event'})", "H_ID29")
+                  tags$span(class = "example-tag", 
+                            onclick = "Shiny.setInputValue('example_click', 'InsDel1a', {priority: 'event'})", 
+                            icon("dna", style = "margin-right: 5px;"), "InsDel1a"),
+                  tags$span(class = "example-tag", 
+                            onclick = "Shiny.setInputValue('example_click', 'InsDel2b', {priority: 'event'})", 
+                            icon("dna", style = "margin-right: 5px;"), "InsDel2b"),
+                  tags$span(class = "example-tag", 
+                            onclick = "Shiny.setInputValue('example_click', 'InsDel3', {priority: 'event'})", 
+                            icon("dna", style = "margin-right: 5px;"), "InsDel3"),
+                  tags$span(class = "example-tag", 
+                            onclick = "Shiny.setInputValue('example_click', 'C_ID1', {priority: 'event'})", 
+                            icon("dna", style = "margin-right: 5px;"), "C_ID1"),
+                  tags$span(class = "example-tag", 
+                            onclick = "Shiny.setInputValue('example_click', 'H_ID30', {priority: 'event'})", 
+                            icon("dna", style = "margin-right: 5px;"), "H_ID30")
+                ),
+                
+                # 快捷键提示
+                p(class = "search-hint",
+                  icon("keyboard"), " Pro tip: Press ", 
+                  tags$kbd("Enter"), " to search quickly"
                 )
             )
         )
     )
   ),
-  
-  
-  
   # ========== About ==========
   tabPanel(
     "About",

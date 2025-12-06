@@ -202,15 +202,16 @@ server <- function(input, output, session){
           column(3,
                  div(class = "thumbnail-card",
                      h4(group_name),
-                     if (!is.null(thumb) && file.exists(file.path("www", thumb))) {
-                       tags$img(src = thumb, style = "width:100%; max-width:200px; height:auto;")
-                     } else {
-                       div(style = "height:120px; line-height:120px; color:#95a5a6;", 
-                           icon("image", style = "font-size:48px;"))
-                     },
-                     
-                     actionButton(paste0("show_", group_name), "View Details",
-                                  class = "btn btn-info")
+                     div(
+                       style = "cursor: pointer;",
+                       onclick = sprintf("Shiny.setInputValue('show_%s', Math.random(), {priority: 'event'});", group_name),
+                       if (!is.null(thumb) && file.exists(file.path("www", thumb))) {
+                         tags$img(src = thumb, style = "width:100%; max-width:200px; height:auto;")
+                       } else {
+                         div(style = "height:120px; line-height:120px; color:#95a5a6;",
+                             icon("image", style = "font-size:48px;"))
+                       }
+                     )
                  )
           )
         })

@@ -28,7 +28,7 @@ for (i in seq_len(nrow(id89_df ))) {
       id476 = if (length(id476_imgs) > 0) id476_imgs else character(0),
       thumbnail = paste0(ID89, "Thumbnail.png"),
       aetiology = aetiology,  # 添加 aetiology
-      desc = "InsDel39 does not have corresponding COSMIC ID83 signature"
+      desc = "InsDel39 does not have corresponding COSMIC83 signature"
     )
   } else {
     signature_groups[[ID89]] <- list(
@@ -99,11 +99,11 @@ server <- function(input, output, session){
       return()
     }
     
-    # ---- 在 ID89 Explorer 中匹配 ----
+    # ---- 在 ID89 Classification 中匹配 ----
     matched89 <- grep(search_term, names(signature_groups),
                       ignore.case = TRUE, value = TRUE)
     
-    # ---- 在 ID83 Explorer 中匹配（查成员 ID89 名）----
+    # ---- 在 ID83 Classification 中匹配（查成员 ID89 名）----
     matched83_found <- character(0)
     for (g in names(id83_groups)) {
       members <- id83_groups[[g]]$members
@@ -129,13 +129,13 @@ server <- function(input, output, session){
     # ---- 同时匹配 ID89 + ID83 → 弹框让用户选 ----
     if (length(matched89) > 0 && length(matched83) > 0) {
       choices <- c(
-        paste0(matched89, "  →  Koh ID89 Explorer"),
-        paste0(matched83, "  →  COSMIC ID83 Explorer")
+        paste0(matched89, "  →  Koh89 Classification"),
+        paste0(matched83, "  →  COSMIC83 Classification")
       )
       
       showModal(modalDialog(
         title = "Multiple Matches Found",
-        tags$p(paste0("The signature '", search_term, "' appears in both Explorers.")),
+        tags$p(paste0("The signature '", search_term, "' appears in both Classifications.")),
         radioButtons("select_search", label = NULL, choices = choices),
         easyClose = TRUE,
         footer = tagList(
@@ -148,7 +148,7 @@ server <- function(input, output, session){
     
     # ---- 只在 ID89 里匹配 ----
     if (length(matched89) > 0) {
-      updateNavbarPage(session, "navbar", selected = "Koh ID89 Explorer")
+      updateNavbarPage(session, "navbar", selected = "Koh89 Classification")
       current_group(matched89[1])
       updateTextInput(session, "search_input", value = "")
       return()
@@ -156,7 +156,7 @@ server <- function(input, output, session){
     
     # ---- 只在 ID83 里匹配 ----
     if (length(matched83) > 0) {
-      updateNavbarPage(session, "navbar", selected = "COSMIC ID83 Explorer")
+      updateNavbarPage(session, "navbar", selected = "COSMIC83 Classification")
       current_id83(matched83[1])
       updateTextInput(session, "search_input", value = "")
       return()
@@ -167,17 +167,17 @@ server <- function(input, output, session){
     choice <- input$select_search
     if (is.null(choice)) return()
     
-    # 用户选择跳到 ID89 Explorer
-    if (grepl("Koh ID89 Explorer$", choice)) {
-      sig89 <- sub("  →  Koh ID89 Explorer$", "", choice)
-      updateNavbarPage(session, "navbar", selected = "Koh ID89 Explorer")
+    # 用户选择跳到 ID89 Classification
+    if (grepl("Koh89 Classification$", choice)) {
+      sig89 <- sub("  →  Koh89 Classification$", "", choice)
+      updateNavbarPage(session, "navbar", selected = "Koh89 Classification")
       current_group(sig89)
     }
     
-    # 用户选择跳到 ID83 Explorer
-    if (grepl("COSMIC ID83 Explorer$", choice)) {
-      sig83 <- sub("  →  COSMIC ID83 Explorer$", "", choice)
-      updateNavbarPage(session, "navbar", selected = "COSMIC ID83 Explorer")
+    # 用户选择跳到 ID83 Classification
+    if (grepl("COSMIC83 Classification$", choice)) {
+      sig83 <- sub("  →  COSMIC83 Classification$", "", choice)
+      updateNavbarPage(session, "navbar", selected = "COSMIC83 Classification")
       current_id83(sig83)
     }
     
@@ -188,7 +188,7 @@ server <- function(input, output, session){
     search_signature(input$search_input)
   })
   
-  # ---------------- Signature Explorer 页面 (Koh ID89) ----------------
+  # ---------------- Signature Classification 页面 (Koh89) ----------------
   output$signature_display <- renderUI({
     if (is.null(current_group())) {
       fluidRow(
@@ -201,23 +201,32 @@ server <- function(input, output, session){
           
           column(3,
                  div(class = "thumbnail-card",
-                     h4(group_name),
+                     actionLink(
+                       inputId = paste0("show_",group_name),
+                       label = tagList(
+                         h4(group_name,style = "color:#2c3e50;font-weight:bold;margin-top:0;"),
+                  
                      if (!is.null(thumb) && file.exists(file.path("www", thumb))) {
-                       tags$img(src = thumb, style = "width:100%; max-width:200px; height:auto;")
+                       tags$img(src = thumb, style = "width:100%; max-width:200px; height:auto;border-radius:5px; transition: transform 0.2s;")
                      } else {
                        div(style = "height:120px; line-height:120px; color:#95a5a6;", 
                            icon("image", style = "font-size:48px;"))
-                     },
+                     }
+                       ),
                      
-                     actionButton(paste0("show_", group_name), "View Details",
-                                  class = "btn btn-info")
+                     style = "text-decoration: none;color: inherit; display: block; cursor:pointer;"
+                     )  
                  )
           )
         })
       )
     } else {
+      
       sig <- signature_groups[[current_group()]]
-      show_types <- input$show_types %||% c("ID89", "ID83", "ID476")
+      
+      show_types <- input$show_types %||% c("ID89","ID83","ID476")
+
+      current_selection <- if (is.null(input$show_types)) c("ID89", "ID83", "ID476")else input$show_types
       
       id89_imgs <- if ("ID89" %in% show_types) sig$imgs else character(0)
       id83_imgs <- if ("ID83" %in% show_types) sig$id83 else character(0)
@@ -231,6 +240,17 @@ server <- function(input, output, session){
         actionButton("back_to_list","← Back to List", class = "btn-back", style = "margin-bottom:20px;"),
         h2(current_group(), style = "color:#2c3e50; font-weight:600; margin-bottom:25px;"),
         
+        
+        div(
+          style = "margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius:5px; border: 1px solid #e9ecef;",
+          checkboxGroupInput(
+            inputId = "show_types",
+            label = "Select signature types to display:",
+            choices = c("Koh89"= "ID89","COSMIC83"= "ID83","Koh476" ="ID476"),
+            selected = current_selection,
+            inline = TRUE
+          )
+        ),
         # 显示 Proposed aetiology（新增）
         if (!is.null(sig$aetiology) && !is.na(sig$aetiology) && nchar(sig$aetiology) > 0) {
           div(style = "background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); 
@@ -331,7 +351,7 @@ server <- function(input, output, session){
     }
   })
   
-  # ---------------- ID83 Explorer 页面 ----------------
+  # ---------------- ID83 Classification 页面 ----------------
   output$id83_display <- renderUI({
     if (is.null(current_id83())) {
       fluidRow(

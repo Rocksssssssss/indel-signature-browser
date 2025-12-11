@@ -31,8 +31,8 @@ create_search_tab <- function() {
                   tags$span(class = "example-tag", onclick = "Shiny.setInputValue('example_click', 'InsDel1a', {priority: 'event'})", "InsDel1a"),
                   tags$span(class = "example-tag", onclick = "Shiny.setInputValue('example_click', 'InsDel2b', {priority: 'event'})", "InsDel2b"),
                   tags$span(class = "example-tag", onclick = "Shiny.setInputValue('example_click', 'InsDel3', {priority: 'event'})", "InsDel3"),
-                  tags$span(class = "example-tag", onclick = "Shiny.setInputValue('example_click', 'InsDel10', {priority: 'event'})", "InsDel10"),
-                  tags$span(class = "example-tag", onclick = "Shiny.setInputValue('example_click', 'InsDel39', {priority: 'event'})", "InsDel39")
+                  tags$span(class = "example-tag", onclick = "Shiny.setInputValue('example_click', 'C_ID10', {priority: 'event'})", "C_ID10"),
+                  tags$span(class = "example-tag", onclick = "Shiny.setInputValue('example_click', 'H_ID27', {priority: 'event'})", "H_ID27")
                 )
             )
         )

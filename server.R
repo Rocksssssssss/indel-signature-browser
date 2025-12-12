@@ -531,7 +531,7 @@ server <- function(input, output, session) {
 
                     div(
                       style = "font-size:11px; color:#7f8c8d !important; margin-bottom:5px;",
-                      "MEMBERS"
+                      "Corresponds to"
                     ),
 
                     # 这里放回 members_text

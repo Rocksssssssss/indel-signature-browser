@@ -492,7 +492,7 @@ server <- function(input, output, session) {
                       column(4, div(class = "img-label", "Sample A (COSMIC83)"), tags$img(src = cosmic83_filtered, class = "signature-img", style = "width:100%;", onclick = sprintf("Shiny.setInputValue('%s', new Date().getTime());", paste0("img_", cosmic83_filtered))))
                     }
                   )
-              )
+                 )
             })
         )
       )

@@ -6,6 +6,11 @@ library(dplyr)
 library(tidyr)
 library(data.table)
 
+options(shiny.fullstacktrace = TRUE)
+options(shiny.error = function() {
+  traceback(2)
+})
+
 # ==============================================================================
 # 1. 数据加载与预处理 (在 Server 函数外部执行)
 # ==============================================================================
@@ -23,6 +28,8 @@ id89_df <- raw_data %>%
   ) %>%
   fill(InDel83, .direction = "down") %>%
   dplyr::filter(!is.na(InDel89)) %>%
+  # Filter out footnote rows - only keep valid signature IDs starting with "InsDel" or "InDel"
+  dplyr::filter(grepl("^Ins?Del", InDel89)) %>%
   mutate(
     InDel83 = as.character(InDel83),
     InDel89 = as.character(InDel89),

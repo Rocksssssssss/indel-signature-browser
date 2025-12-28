@@ -37,13 +37,14 @@ create_home_tab <- function() {
          tags$ul(
             style = h3_style,
             tags$li(
-               tags$a(
-                  tags$strong("83-type classification scheme:"),
-                  " ",
-                  icon("link", style = "font-size:14px;"),
-                  href = "#",
-                  onclick = "Shiny.setInputValue('home_goto_cosmic83', Math.random(), {priority: 'event'}); return false;",
-                  style = "color:#3498db; text-decoration:none; cursor:pointer; transition: color 0.3s;"
+               actionLink(
+                  "home_goto_cosmic83",
+                  tagList(
+                     tags$strong("83-type classification scheme"),
+                     " ",
+                     icon("link", style = "font-size:14px;")
+                  ),
+                  style = "color:#3498db; text-decoration:none; cursor:pointer;"
                ),
                paste(
                   " This widely used classification scheme recognizes 83 types of indel.",
@@ -51,13 +52,14 @@ create_home_tab <- function() {
                )
             ),
             tags$li(
-               tags$a(
-                  tags$strong("89-type classification scheme:"),
-                  " ",
-                  icon("link", style = "font-size:14px;"),
-                  href = "#",
-                  onclick = "Shiny.setInputValue('home_goto_koh89', Math.random(), {priority: 'event'}); return false;",
-                  style = "color:#3498db; text-decoration:none; cursor:pointer; transition: color 0.3s;"
+               actionLink(
+                  "home_goto_koh89",
+                  tagList(
+                     tags$strong("89-type classification scheme:"),
+                     " ",
+                     icon("link", style = "font-size:14px;")
+                  ),
+                  style = "color:#3498db; text-decoration:none; cursor:pointer;"
                ),
                paste(
                   " This new indel classifiction scheme (Koh et al., 2025) recognizes 89 types of indel.",

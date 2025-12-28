@@ -180,11 +180,11 @@ server <- function(input, output, session) {
 
   # ---------------- Home page navigation links ----------------
   observeEvent(input$home_goto_koh89, {
-    updateNavbarPage(session, "navbar", selected = "Koh89 Classification")
+    updateNavbarPage(session, "navbar", selected = "89-type classification")
   })
 
   observeEvent(input$home_goto_cosmic83, {
-    updateNavbarPage(session, "navbar", selected = "COSMIC83 Classification")
+    updateNavbarPage(session, "navbar", selected = "83-type classification")
   })
 
   # ---------------- Search 页面逻辑 ----------------
@@ -266,13 +266,13 @@ server <- function(input, output, session) {
     }
 
     if (length(matched89) == 1) {
-      updateNavbarPage(session, "navbar", selected = "Koh89 Classification")
+      updateNavbarPage(session, "navbar", selected = "89-type classification")
       current_group(matched89[1])
       updateTextInput(session, "search_input", value = "")
       return()
     }
     if (length(matched83) == 1) {
-      updateNavbarPage(session, "navbar", selected = "COSMIC83 Classification")
+      updateNavbarPage(session, "navbar", selected = "83-type classification")
       current_id83(matched83[1])
       updateTextInput(session, "search_input", value = "")
       return()
@@ -287,13 +287,13 @@ server <- function(input, output, session) {
 
     if (grepl("\\[Type: Koh89\\]$", choice)) {
       sig89 <- sub(" \\[Type: Koh89\\]$", "", choice)
-      updateNavbarPage(session, "navbar", selected = "Koh89 Classification")
+      updateNavbarPage(session, "navbar", selected = "89-type classification")
       current_group(sig89)
     }
 
     if (grepl("\\[Type: COSMIC83\\]$", choice)) {
       sig83 <- sub(" \\[Type: COSMIC83\\]$", "", choice)
-      updateNavbarPage(session, "navbar", selected = "COSMIC83 Classification")
+      updateNavbarPage(session, "navbar", selected = "83-type classification")
       current_id83(sig83)
     }
     updateTextInput(session, "search_input", value = "")

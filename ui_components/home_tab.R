@@ -15,11 +15,9 @@ create_home_tab <- function() {
             style = "color:#2c3e50; font-weight:700; margin-bottom:25px;"
          ),
          h3(
-            paste(
-               "Small insertions and deletions, \"indels\" for short, are mutations that ",
-               "add or delete small sequences of DNA (conventionally < ~50 base pairs long).",
-               "There is no single intuitive and naturally"
-            ),
+            "Small insertions and deletions, \"indels\" for short, are mutations that 
+            add or delete small sequences of DNA (conventionally < ~50 base pairs long).",
+            ,
             style = h3_style
          ),
          h3(

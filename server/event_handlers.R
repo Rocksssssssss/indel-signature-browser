@@ -8,32 +8,38 @@ init_event_handlers <- function(input, output, session, current_group, current_i
 
   # Home page navigation links
   observeEvent(input$home_goto_koh89, {
-    updateNavbarPage(session, "navbar", selected = "89-type classification")
+    log_user_action("home_goto_koh89")
+    updateNavbarPage(session, "navbar", selected = CONFIG$tabs$KOH89)
   })
 
   observeEvent(input$home_goto_cosmic83, {
-    updateNavbarPage(session, "navbar", selected = "83-type classification")
+    log_user_action("home_goto_cosmic83")
+    updateNavbarPage(session, "navbar", selected = CONFIG$tabs$COSMIC83)
   })
 
   # Signature group click handlers
   lapply(names(signature_groups), function(group_name) {
     observeEvent(input[[paste0("show_", group_name)]], {
+      log_user_action("select_signature", group_name)
       current_group(group_name)
     })
   })
 
   observeEvent(input$back_to_list, {
+    log_user_action("back_to_list")
     current_group(NULL)
   })
 
   # ID83 group click handlers
   lapply(names(id83_groups), function(id83_name) {
     observeEvent(input[[paste0("show_id83_", id83_name)]], {
+      log_user_action("select_id83", id83_name)
       current_id83(id83_name)
     })
   })
 
   observeEvent(input$back_to_id83_list, {
+    log_user_action("back_to_id83_list")
     current_id83(NULL)
   })
 
@@ -61,25 +67,11 @@ init_event_handlers <- function(input, output, session, current_group, current_i
     # Bind click events for each image
     lapply(all_imgs, function(img) {
       observeEvent(input[[paste0("img_", img)]], ignoreInit = TRUE, {
-        display_title <- "Signature View"
+        # Use helper function to get display title
+        display_title <- get_image_display_title(img)
 
-        if (grepl("signature\\.89spectrum", img)) {
-          display_title <- "89-Type Signature"
-        } else if (grepl("_89spectrumA", img)) {
-          display_title <- "Koh89 Sample A (Original Spectrum)"
-        } else if (grepl("_89spectrumB", img)) {
-          display_title <- "Koh89 Sample B (Reconstructed)"
-        } else if (grepl("_89spectrumC", img)) {
-          display_title <- "Koh89 Sample A-B (Residual)"
-        } else if (grepl("_83all", img)) {
-          display_title <- "83-Type Signature"
-        } else if (grepl("_83filtered", img)) {
-          display_title <- "Sample A in 83-Type Representation"
-        } else if (grepl("_476all", img)) {
-          display_title <- "476-Type Signature"
-        } else if (grepl("Thumbnail", img)) {
-          display_title <- "Group Thumbnail"
-        }
+        log_user_action("view_image", img)
+
         showModal(modalDialog(
           title = display_title,
           easyClose = TRUE,

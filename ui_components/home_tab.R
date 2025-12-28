@@ -1,6 +1,5 @@
 # Home Tab Component
-library(shiny)
-library(shinyjs)
+# Note: Packages loaded via R/dependencies.R from ui.R
 
 h3_style = "color:#34495e; font-size:18px; line-height:1.8; margin-bottom:20px;"
 

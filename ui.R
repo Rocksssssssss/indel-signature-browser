@@ -1,8 +1,9 @@
 # UI Definition for Indel Signature Browser
 # This file orchestrates the main UI structure by sourcing modular components
 
-library(shiny)
-library(shinyjs)
+# Load all dependencies from central location
+source("R/dependencies.R")
+load_dependencies()
 
 # Source all UI components
 source("ui_components/home_tab.R")

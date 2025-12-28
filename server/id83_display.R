@@ -15,7 +15,7 @@ render_id83_display <- function(input, output, current_id83) {
       }
 
       # Group into rows of 4
-      chunk_size <- 4
+      chunk_size <- CONFIG$ui$grid_columns
       id_chunks <- split(all_names, ceiling(seq_along(all_names) / chunk_size))
 
       tagList(
@@ -26,12 +26,38 @@ render_id83_display <- function(input, output, current_id83) {
               id83_info <- id83_groups[[id83_name]]
               members_text <- paste(id83_info$members, collapse = ", ")
               thumbnail_path <- id83_info$thumbnail
+              has_thumbnail <- image_exists(thumbnail_path)
+
+              # Build extra content showing member signatures
+              members_content <- div(
+                style = sprintf(
+                  "background:%s; padding:8px; border-radius:4px; text-align:left;",
+                  CONFIG$colors$light_bg
+                ),
+                div(
+                  style = sprintf(
+                    "font-size:11px; color:%s; margin-bottom:5px; font-weight:bold;",
+                    CONFIG$colors$muted
+                  ),
+                  "Corresponds to:"
+                ),
+                div(
+                  style = sprintf(
+                    "font-size:12px; color:%s; line-height:1.4;",
+                    CONFIG$colors$primary_light
+                  ),
+                  members_text
+                )
+              )
 
               column(
                 3,
                 div(
                   class = "thumbnail-card",
-                  style = "background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 15px; height: 280px; overflow-y: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: box-shadow 0.3s;",
+                  style = sprintf(
+                    "background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 15px; height: %s; overflow-y: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: box-shadow 0.3s;",
+                    CONFIG$ui$card_height
+                  ),
                   onmouseover = "this.style.boxShadow='0 5px 15px rgba(0,0,0,0.2)'",
                   onmouseout = "this.style.boxShadow='0 2px 5px rgba(0,0,0,0.05)'",
 
@@ -40,16 +66,14 @@ render_id83_display <- function(input, output, current_id83) {
                     label = tagList(
                       h4(
                         id83_name,
-                        style = "color:#27ae60; margin-top:0; font-weight:700; text-align: center;"
+                        style = sprintf(
+                          "color:%s; margin-top:0; font-weight:700; text-align: center;",
+                          CONFIG$colors$success
+                        )
                       ),
-
                       div(
                         style = "height: 150px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; background: #f9f9f9; border-radius: 4px;",
-                        if (
-                          !is.null(thumbnail_path) &&
-                            length(thumbnail_path) > 0 &&
-                            file.exists(file.path("www", thumbnail_path))
-                        ) {
+                        if (has_thumbnail) {
                           tags$img(
                             src = thumbnail_path,
                             style = "max-height: 100%; max-width: 100%; border-radius: 4px;"
@@ -57,26 +81,12 @@ render_id83_display <- function(input, output, current_id83) {
                         } else {
                           div(
                             style = "color:#ccc; text-align: center;",
-                            icon(
-                              "image",
-                              style = "font-size:32px; display: block;"
-                            ),
+                            icon("image", style = "font-size:32px; display: block;"),
                             tags$small("No Image")
                           )
                         }
                       ),
-
-                      div(
-                        style = "background:#f4f6f7; padding:8px; border-radius:4px; text-align:left;",
-                        div(
-                          style = "font-size:11px; color:#7f8c8d; margin-bottom:5px; font-weight:bold;",
-                          "Corresponds to:"
-                        ),
-                        div(
-                          style = "font-size:12px; color:#34495e; line-height:1.4;",
-                          members_text
-                        )
-                      )
+                      members_content
                     ),
                     style = "text-decoration: none; color: inherit; display: block;"
                   )
@@ -93,43 +103,23 @@ render_id83_display <- function(input, output, current_id83) {
       id83_all_img <- id83_info$id83_all
 
       tagList(
-        actionButton(
-          "back_to_id83_list",
-          "\u2190 Back to ID83 List",
-          class = "btn-back",
-          style = "margin-bottom:20px;"
-        ),
+        render_back_button("back_to_id83_list", "Back to 83-Type List"),
         h2(
-          paste("ID83:", current_id83()),
-          style = "color:#27ae60; font-weight:600; margin-bottom:25px;"
+          paste("83-Type:", current_id83()),
+          style = sprintf(
+            "color:%s; font-weight:600; margin-bottom:25px;",
+            CONFIG$colors$success
+          )
         ),
 
         # ID83 Signature image
         div(
           class = "id83-section",
-          div(class = "id83-label", icon("layer-group"), " Signature"),
-          if (
-            !is.null(id83_all_img) &&
-              length(id83_all_img) > 0 &&
-              file.exists(file.path("www", id83_all_img))
-          ) {
-            tags$img(
-              src = id83_all_img,
-              class = "signature-img",
-              style = "max-width:700px; width:100%;",
-              onclick = sprintf(
-                "Shiny.setInputValue('%s', new Date().getTime());",
-                paste0("img_", id83_all_img)
-              )
-            )
-          } else {
-            div(
-              style = "color:#95a5a6; text-align:center; padding:40px;",
-              icon("image", style = "font-size:48px;"),
-              br(),
-              "No image available"
-            )
-          }
+          div(class = "id83-label", icon("layer-group"), " ", CONFIG$labels$SIGNATURE),
+          render_image_or_placeholder(
+            id83_all_img,
+            max_width = CONFIG$ui$image_max_width
+          )
         ),
 
         # Member details
@@ -146,13 +136,9 @@ render_id83_display <- function(input, output, current_id83) {
               return(NULL)
             }
 
-            koh89_spectrum <- if (length(sig$imgs) >= 1) sig$imgs[1] else NULL
-            koh89_sampleA <- if (length(sig$imgs) >= 2) sig$imgs[2] else NULL
-            cosmic83_filtered <- if (length(sig$id83) >= 2) {
-              sig$id83[2]
-            } else {
-              NULL
-            }
+            type89_spectrum <- if (length(sig$imgs) >= 1) sig$imgs[1] else NULL
+            type89_sampleA <- if (length(sig$imgs) >= 2) sig$imgs[2] else NULL
+            type83_filtered <- if (length(sig$id83) >= 2) sig$id83[2] else NULL
 
             div(
               class = "member-section",
@@ -163,80 +149,30 @@ render_id83_display <- function(input, output, current_id83) {
                 member_name
               ),
 
-              # Aetiology
-              if (
-                !is.null(sig$aetiology) &&
-                  !is.na(sig$aetiology) &&
-                  nchar(sig$aetiology) > 0
-              ) {
-                div(
-                  style = "background:#fff3cd; padding:12px; border-radius:6px; margin-bottom:15px; border-left:3px solid #ffc107;",
-                  tags$strong(
-                    style = "color:#856404; font-size:12px;",
-                    icon("lightbulb"),
-                    " Proposed Aetiology: "
-                  ),
-                  tags$span(
-                    style = "color:#856404; font-size:13px;",
-                    sig$aetiology
-                  )
-                )
-              },
+              # Aetiology (compact version)
+              render_aetiology(sig$aetiology, compact = TRUE),
 
               # Member images
               fluidRow(
-                if (
-                  !is.null(koh89_spectrum) &&
-                    file.exists(file.path("www", koh89_spectrum))
-                ) {
+                if (image_exists(type89_spectrum)) {
                   column(
                     4,
-                    div(class = "img-label", "89-Type Signature"),
-                    tags$img(
-                      src = koh89_spectrum,
-                      class = "signature-img",
-                      style = "width:100%;",
-                      onclick = sprintf(
-                        "Shiny.setInputValue('%s', new Date().getTime());",
-                        paste0("img_", koh89_spectrum)
-                      )
-                    )
+                    render_label(paste0(CONFIG$labels$TYPE_89, " ", CONFIG$labels$SIGNATURE)),
+                    render_image(type89_spectrum, max_width = "100%")
                   )
                 },
-                if (
-                  !is.null(koh89_sampleA) &&
-                    file.exists(file.path("www", koh89_sampleA))
-                ) {
+                if (image_exists(type89_sampleA)) {
                   column(
                     4,
-                    div(class = "img-label", "Koh89 Sample A"),
-                    tags$img(
-                      src = koh89_sampleA,
-                      class = "signature-img",
-                      style = "width:100%;",
-                      onclick = sprintf(
-                        "Shiny.setInputValue('%s', new Date().getTime());",
-                        paste0("img_", koh89_sampleA)
-                      )
-                    )
+                    render_label("89-Type Sample A"),
+                    render_image(type89_sampleA, max_width = "100%")
                   )
                 },
-                if (
-                  !is.null(cosmic83_filtered) &&
-                    file.exists(file.path("www", cosmic83_filtered))
-                ) {
+                if (image_exists(type83_filtered)) {
                   column(
                     4,
-                    div(class = "img-label", "Sample A (83-Type)"),
-                    tags$img(
-                      src = cosmic83_filtered,
-                      class = "signature-img",
-                      style = "width:100%;",
-                      onclick = sprintf(
-                        "Shiny.setInputValue('%s', new Date().getTime());",
-                        paste0("img_", cosmic83_filtered)
-                      )
-                    )
+                    render_label("Sample A (83-Type)"),
+                    render_image(type83_filtered, max_width = "100%")
                   )
                 }
               )

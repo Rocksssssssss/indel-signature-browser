@@ -45,6 +45,9 @@ search_signature <- function(input, session, current_group, current_id83) {
   }
   matched83 <- unique(c(matched83_found, matched83_names))
 
+  # Log search results
+  log_search(search_term, length(matched89), length(matched83))
+
   if (length(matched89) == 0 && length(matched83) == 0) {
     showModal(modalDialog(
       title = "Signature Not Found",
@@ -62,10 +65,10 @@ search_signature <- function(input, session, current_group, current_id83) {
   ) {
     choices <- c()
     if (length(matched89) > 0) {
-      choices <- c(choices, paste0(matched89, " [Type: Koh89]"))
+      choices <- c(choices, paste0(matched89, " ", CONFIG$search$type_labels$koh89))
     }
     if (length(matched83) > 0) {
-      choices <- c(choices, paste0(matched83, " [Type: 83-Type]"))
+      choices <- c(choices, paste0(matched83, " ", CONFIG$search$type_labels$cosmic83))
     }
 
     showModal(modalDialog(
@@ -82,13 +85,13 @@ search_signature <- function(input, session, current_group, current_id83) {
   }
 
   if (length(matched89) == 1) {
-    updateNavbarPage(session, "navbar", selected = "89-type classification")
+    updateNavbarPage(session, "navbar", selected = CONFIG$tabs$KOH89)
     current_group(matched89[1])
     updateTextInput(session, "search_input", value = "")
     return()
   }
   if (length(matched83) == 1) {
-    updateNavbarPage(session, "navbar", selected = "83-type classification")
+    updateNavbarPage(session, "navbar", selected = CONFIG$tabs$COSMIC83)
     current_id83(matched83[1])
     updateTextInput(session, "search_input", value = "")
     return()
@@ -104,15 +107,20 @@ init_search_handlers <- function(input, output, session, current_group, current_
       return()
     }
 
-    if (grepl("\\[Type: Koh89\\]$", choice)) {
-      sig89 <- sub(" \\[Type: Koh89\\]$", "", choice)
-      updateNavbarPage(session, "navbar", selected = "89-type classification")
+    koh89_label <- CONFIG$search$type_labels$koh89
+    cosmic83_label <- CONFIG$search$type_labels$cosmic83
+
+    if (grepl(paste0("\\", koh89_label, "$"), choice)) {
+      sig89 <- sub(paste0(" \\", koh89_label, "$"), "", choice)
+      log_user_action("search_select", paste("89-type:", sig89))
+      updateNavbarPage(session, "navbar", selected = CONFIG$tabs$KOH89)
       current_group(sig89)
     }
 
-    if (grepl("\\[Type: 83-Type\\]$", choice)) {
-      sig83 <- sub(" \\[Type: 83-Type\\]$", "", choice)
-      updateNavbarPage(session, "navbar", selected = "83-type classification")
+    if (grepl(paste0("\\", cosmic83_label, "$"), choice)) {
+      sig83 <- sub(paste0(" \\", cosmic83_label, "$"), "", choice)
+      log_user_action("search_select", paste("83-type:", sig83))
+      updateNavbarPage(session, "navbar", selected = CONFIG$tabs$COSMIC83)
       current_id83(sig83)
     }
     updateTextInput(session, "search_input", value = "")
@@ -120,6 +128,7 @@ init_search_handlers <- function(input, output, session, current_group, current_
   })
 
   observeEvent(input$search_btn, {
+    log_user_action("search", input$search_input)
     search_signature(input, session, current_group, current_id83)
   })
 }

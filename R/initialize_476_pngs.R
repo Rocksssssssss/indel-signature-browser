@@ -3,7 +3,11 @@ library(mSigPlot)
 library(Cairo)
 source("config.R")
 initialize_476_pngs = function() {
-  df = read.delim(get_config("type_476_signatures"), sep = '\t')
+  sigfile = get_config("type_476_signatures")
+  if (!file.exists(sigfile)) {
+    stop(sigfile, "does not exist")
+  }
+  df = read.delim(sigfile, sep = '\t')
 
   for (i in 1:34) {
     # This is a hack; we need to get up to date file
@@ -27,7 +31,8 @@ initialize_476_pngs = function() {
       df[, i, drop = FALSE],
       plot_title = plot_title,
       base_size = 30,
-      simplify_labels = FALSE
+      simplify_labels = FALSE,
+      num_labels = 5
     )
     print(p)
 

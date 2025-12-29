@@ -5,7 +5,6 @@
 
 # Render the 89-type signature display
 render_signature_display <- function(input, output, current_group) {
-
   output$signature_display <- renderUI({
     if (is.null(current_group())) {
       # Grid view - show all signatures
@@ -76,8 +75,12 @@ render_signature_display <- function(input, output, current_group) {
         if (length(id89_imgs) >= 1 && image_exists(id89_imgs[1])) {
           div(
             class = "img-container",
-            render_section_title(paste0(CONFIG$labels$TYPE_89, " ", CONFIG$labels$SIGNATURE)),
-            render_label(CONFIG$labels$SIGNATURE),
+            render_section_title(paste0(
+              CONFIG$labels$TYPE_89,
+              " ",
+              CONFIG$labels$SIGNATURE
+            )),
+            # render_label(CONFIG$labels$SIGNATURE),
             render_image(id89_imgs[1], max_width = CONFIG$ui$image_max_width)
           )
         },
@@ -86,14 +89,17 @@ render_signature_display <- function(input, output, current_group) {
         if (length(id89_imgs) > 1) {
           div(
             class = "img-container",
-            render_section_title("Example tumor spectrum with this signature"),
+            render_section_title(paste(
+              "Example tumor spectrum with",
+              current_group()
+            )),
             p(
               class = "text-muted",
               style = sprintf(
                 "margin-top: -8px; margin-bottom: 12px; color:%s; font-size: 12px;",
                 CONFIG$colors$muted
               ),
-              "Click an image to view details. Sample A is the example tumor spectrum; Sample B is the partial spectrum contributed by all other signatures; Sample A-B is the difference."
+              "Sample A is the example tumor spectrum; Sample B is the partial spectrum contributed by all other signatures; Sample A-B is the difference."
             ),
             fluidRow(
               lapply(seq_along(id89_imgs[-1]), function(i) {
@@ -113,20 +119,32 @@ render_signature_display <- function(input, output, current_group) {
         if (length(id83_imgs) > 0) {
           div(
             class = "img-container",
-            render_section_title(paste0(CONFIG$labels$TYPE_83, " ", CONFIG$labels$SIGNATURE)),
+            render_section_title(paste0(
+              CONFIG$labels$TYPE_83,
+              " ",
+              CONFIG$labels$SIGNATURE,
+              " corresponding to ",
+              current_group()
+            )),
             if (length(id83_imgs) >= 1 && image_exists(id83_imgs[1])) {
               tagList(
-                render_label("Signature Spectrum"),
+                # render_label("Signature Spectrum"),
                 div(
                   style = "margin-bottom:25px;",
-                  render_image(id83_imgs[1], max_width = CONFIG$ui$image_max_width)
+                  render_image(
+                    id83_imgs[1],
+                    max_width = CONFIG$ui$image_max_width
+                  )
                 )
               )
             },
             if (length(id83_imgs) >= 2 && image_exists(id83_imgs[2])) {
               tagList(
                 render_label("Sample A in 83-Type representation"),
-                render_image(id83_imgs[2], max_width = CONFIG$ui$image_max_width)
+                render_image(
+                  id83_imgs[2],
+                  max_width = CONFIG$ui$image_max_width
+                )
               )
             }
           )
@@ -136,15 +154,17 @@ render_signature_display <- function(input, output, current_group) {
         if (length(id476_imgs) >= 1 && image_exists(id476_imgs[1])) {
           div(
             class = "img-container",
-            render_section_title(paste0(CONFIG$labels$TYPE_476, " ", CONFIG$labels$SIGNATURE)),
-            render_label("Extended Signature Set"),
+            render_section_title(paste0(
+              CONFIG$labels$TYPE_476,
+              " ",
+              CONFIG$labels$SIGNATURE
+            )),
+            # render_label("Extended Signature Set"),
             p(
               style = sprintf(
                 "font-size: 13px; color: %s; margin-top: -5px; margin-bottom: 10px;",
                 CONFIG$colors$muted
-              ),
-              icon("mouse-pointer"),
-              " Right-click and open in new tab for full view"
+              )
             ),
             render_image(id476_imgs[1], max_width = "100%")
           )

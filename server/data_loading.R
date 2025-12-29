@@ -5,12 +5,15 @@
 # ==============================================================================
 
 # Validate data files before loading
-tryCatch({
-  validate_data_files(CONFIG)
-}, error = function(e) {
-  log_error("Data file validation failed: %s", e$message)
-  stop(e)
-})
+tryCatch(
+  {
+    validate_data_files(CONFIG)
+  },
+  error = function(e) {
+    log_error("Data file validation failed: %s", e$message)
+    stop(e)
+  }
+)
 
 # Read Excel file
 log_info("Loading data from %s", CONFIG$data_file)
@@ -37,7 +40,7 @@ id89_df <- raw_data %>%
 log_info("Processed %d signature records", nrow(id89_df))
 
 # Read 476 list
-log_info("Loading signatures from %s", CONFIG$signatures_csv)
+log_info("Loading 476 signatures from %s", CONFIG$signatures_csv)
 id476_df <- read.csv(
   CONFIG$signatures_csv,
   header = TRUE,
@@ -49,7 +52,11 @@ ID476_list <- colnames(id476_df)
 log_data_load(CONFIG$signatures_csv, TRUE, nrow(id476_df))
 
 # Get all image files
-all_pngs <- list.files(CONFIG$images_dir, pattern = "\\.png$", full.names = FALSE)
+all_pngs <- list.files(
+  CONFIG$images_dir,
+  pattern = "\\.png$",
+  full.names = FALSE
+)
 log_info("Found %d PNG images in %s", length(all_pngs), CONFIG$images_dir)
 
 # --- Build signature_groups (keyed by ID89) ---
@@ -76,10 +83,15 @@ for (i in seq_len(nrow(id89_df))) {
       CONFIG$image_patterns$sample_c
     )
   )
-  id83_imgs <- paste0(ID89, "_", ID83, c(
-    CONFIG$image_patterns$id83_all,
-    CONFIG$image_patterns$id83_filtered
-  ))
+  id83_imgs <- paste0(
+    ID89,
+    "_",
+    ID83,
+    c(
+      CONFIG$image_patterns$id83_all,
+      CONFIG$image_patterns$id83_filtered
+    )
+  )
   id476_imgs <- grep(
     paste0("^", ID89, CONFIG$image_patterns$id476, ".*\\.png$"),
     all_pngs,
@@ -135,7 +147,12 @@ for (i in seq_len(nrow(id89_df))) {
   }
 
   # Set main image path
-  expected_83all <- paste0(raw_id89, "_", raw_id83, CONFIG$image_patterns$id83_all)
+  expected_83all <- paste0(
+    raw_id89,
+    "_",
+    raw_id83,
+    CONFIG$image_patterns$id83_all
+  )
   if (length(id83_groups[[id83_key]]$id83_all) == 0) {
     if (file.exists(file.path(CONFIG$images_dir, expected_83all))) {
       id83_groups[[id83_key]]$id83_all <- expected_83all

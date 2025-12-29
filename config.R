@@ -10,7 +10,9 @@ APP_ENV <- Sys.getenv("SHINY_ENV", "development")
 CONFIG <- list(
   # Data files
   data_file = "data/table_1_2025_12_22.xlsx",
-  signatures_csv = "data/mSigHdp.indel476.final.signatures.csv",
+  # signatures_csv = "data/mSigHdp.indel476.final.signatures.csv",
+  signatures_csv = "data/type476_liu_et_al_sigs.tsv", # temporary
+  type_476_signatures = "data/type476_liu_et_al_sigs.tsv",
   images_dir = "www",
 
   # Tab names (must match tabPanel names in ui_components/)
